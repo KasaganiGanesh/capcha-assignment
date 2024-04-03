@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capcha Code</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="container">
+        <img src="dounload1.jpg" alt="" class="img1">
+        <img src="dounload2.jpg" alt="" class="img2">
+        <img src="dounload7.jpg" alt="" class="img3">
+        <img src="dounload4.jpg" alt="" class="img4">
+        <img src="dounload6.jpg" alt="" class="img5">
+        <img src="dounload1.jpg" alt="" class="img6">
+    </div>
+
+    <button id="reset" style="display: none;">Reset</button>
+    <button id="verify" style="display: none;">Verify</button>
+    <p id="para"></p>
+
+    <script>
+        const images = document.querySelectorAll('img');
+        const resetButton = document.getElementById('reset');
+        const verifyButton = document.getElementById('verify');
+        const para = document.getElementById('para');
+        let clickedImages = [];
+        let state = 1;
+
+        function shuffleImages() {
+            const imageContainer = document.getElementById('container');
+            for (let i = imageContainer.children.length; i >= 0; i--) {
+                imageContainer.appendChild(imageContainer.children[Math.random() * i | 0]);
+            }
+        }
+
+        function resetState() {
+            clickedImages = [];
+            resetButton.style.display = 'none';
+            verifyButton.style.display = 'none';
+            para.textContent = '';
+            para.style.display = 'none';
+            document.querySelectorAll('.error').forEach(error => error.remove());
+            state = 1;
+        }
+
+        function checkIdentical() {
+            return clickedImages.length === 2 && clickedImages[0].src === clickedImages[1].src;
+        }
+
+        function handleImageClick(event) {
+            if (state === 1) {
+                resetButton.style.display = 'block';
+                state = 2;
+            }
+            if (clickedImages.length < 2 && !clickedImages.includes(event.target)) {
+                clickedImages.push(event.target);
+                event.target.classList.add('selected');
+                if (clickedImages.length === 2) {
+                    verifyButton.style.display = 'block';
+                    state = 3;
+                }
+            } else {
+                const errorParagraph = document.createElement('p');
+                errorParagraph.textContent = 'You can select a maximum of two images.';
+                errorParagraph.classList.add('error');
+                document.body.appendChild(errorParagraph);
+            }
+        }
+
+        function handleVerifyClick() {
+            if (checkIdentical()) {
+                para.textContent = 'Hohoo! You are a Human 😊😀';
+            } else {
+                para.textContent = "You are Not a Human 🧐👻";
+            }
+            para.style.display = 'block';
+            verifyButton.style.display = 'none';
+            state = 4;
+        }
+
+        images.forEach(image => image.addEventListener('click', handleImageClick));
+
+        resetButton.addEventListener('click', () => {
+            resetState();
+            shuffleImages();
+            document.querySelectorAll('.selected').forEach(selected => selected.classList.remove('selected'));
+            para.textContent = '';
+        });
+
+        verifyButton.addEventListener('click', handleVerifyClick);
+
+        shuffleImages();
+    </script>
+</body>
+</html>
